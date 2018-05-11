@@ -15,10 +15,10 @@ from django.contrib import auth
 
 
 class LoginUserForm(forms.Form):
-    username = forms.CharField(label=u'账 号',
-        widget=forms.TextInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(label=u'密 码',
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    username = forms.CharField(label=u'账 号', error_messages={'required': u'账号不能为空'},
+        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'text', 'placeholder': 'User ID', 'autofocus': 'True'}))
+    password = forms.CharField(label=u'密 码', error_messages={'required': u'密码不能为空'},
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'type': 'password', 'placeholder': 'Password'}))
 
     def __init__(self,*args, **kwargs):
         self.user_cache = ''
@@ -26,6 +26,7 @@ class LoginUserForm(forms.Form):
 
     def clean(self):
         username = self.cleaned_data.get('username')
+        print username
         password = self.cleaned_data.get('password')
         if username and password:
             self.user_cache = auth.authenticate(username=username,password=password)
@@ -39,9 +40,9 @@ class LoginUserForm(forms.Form):
         return self.user_cache
 
 class registerForm(forms.Form):
-    username = forms.CharField(label=u'账 号', error_messages={'required': u'账号不能为空'},
-         widget=forms.TextInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(label=u'密 码', error_messages={'required': u'密码不能为空'},
-         widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    email = forms.EmailField(label=u'电子邮件', error_messages={'required': u'邮箱不能为空'},
-         widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    new_username = forms.CharField(label=u'账 号',
+         widget=forms.TextInput(attrs={'type': 'text', 'placeholder': 'username', 'autocomplete': 'off', 'class': 'form-control placeholder-no-fix'}))
+    new_password = forms.CharField(label=u'密 码',
+         widget=forms.PasswordInput(attrs={'type': 'password', 'placeholder': 'Password', 'autocomplete': 'off', 'class': 'form-control placeholder-no-fix'}))
+    new_email = forms.EmailField(label=u'电子邮件',
+         widget=forms.EmailInput(attrs={'type': 'text', 'placeholder': 'Email', 'autocomplete': 'off', 'class': 'form-control placeholder-no-fix'}))
