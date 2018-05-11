@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>register</title>
+</head>
+<body>
+<h3>用户注册</h3>
+{% if error %}
+    <script type="text/javascript">
+        alert("{{ error }}");
+    </script>
+{% endif %}
+<form action="{% url 'register' %}" method="POST">
+    {% csrf_token %}
+    {% for i in form %}
+        <div>
+        <label>{{ i.label }}:</label>
+        </div>
+        <div>
+        {{ i }}
+        </div>
+    {% endfor %}
+     <input type="submit" value="提交" />
+</form>
+<a href="{% url 'login' %}">返回登陆</a>
+</body>
+</html>
