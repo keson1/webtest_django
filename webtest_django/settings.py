@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'main',
+    'cmdb',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -82,8 +83,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'djangoTest',
         'USER': 'yisa_oe',
-        'PASSWORD': 'yisa_oe',
-        'HOST': '192.168.43.221',
+        'PASSWORD': 'A10C20F444E2830E18F01B8510B8D177',
+        'HOST': '192.168.171.200',
         'PORT': '3306'
     }
 }

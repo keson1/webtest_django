@@ -10,5 +10,7 @@ def main(request):
     username = request.user.username
     return render(request, 'main/main.html', {'username': username})
 
+@login_required()
 def index(request):
-    return render(request, 'main/index.html')
+    username = request.user.username
+    return render(request, 'main/main.html', {'username': username})

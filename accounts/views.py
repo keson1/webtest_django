@@ -20,31 +20,25 @@ def loginauth(request):
             ret['status'] = True
         else:
             ret['reason'] = 'codewrong'
-    print ret
     return JsonResponse(ret)
 
 def register(request):
-    error = ''
-    f = registerForm(request.POST)
+    ret = {'status': False, 'reason': ''}
     if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
+        username = request.POST.get('user', '')
+        password = request.POST.get('code', '')
         email = request.POST.get('email', '')
         register_time = time.strftime("%Y-%m-%d %H:%M:%S")
         is_exist = User.objects.filter(username=username)
         if is_exist:
-            error = '用户名已存在'
+            ret['reason'] = 'already existed'
         else:
             try:
                 User.objects.create_user(username=username, password=password, date_joined=register_time, email=email)
-                error = '添加成功'
+                ret['status'] = True
             except Exception:
-                error = '添加失败'
-    context = {
-        'form': f,
-        'error': error,
-    }
-    return render(request, 'accounts/register.html', context)
+                ret['reason'] = 'failed'
+    return JsonResponse(ret)
 
 @login_required
 def logout(request):

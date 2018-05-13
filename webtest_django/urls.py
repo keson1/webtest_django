@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^$', views.index),
     url(r'^accounts/', include('accounts.urls')),
     url(r'^main/', include('main.urls')),
+    url(r'^cmdb/', include('cmdb.urls')),
 ]

@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+<div class="form-panel">
+    <h4><i class="fa fa-angle-right"></i> 资产信息</h4>
+    <!-- Split button -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-theme03" id="{{ project.id }}">{{ project.projectname }}</button>
+        <button type="button" class="btn btn-theme03 dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            {% for item in projectlist %}
+                <li><a href="{% url "assetinfo" %}?id={{ item.id }}">{{ item.projectname }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="btn-group pull-right">
+        <button type="button" class="btn btn-theme03" name="getdata" onclick="coldata();">生成设备信息</button>
+        <button type="button" class="btn btn-theme03"><i class="fa fa-check" onclick="addnodemodal();"> 添加资产</i></button>
+    </div>
+    <table class="table table-striped table-advance table-hover">
+        <thead>
+        <tr>
+            <th><i class="fa fa-bullhorn"></i> IP地址</th>
+            <th><i class="fa fa-bookmark"></i> 节点名称</th>
+			<th class="hidden-phone"><i class="fa fa-question-circle"></i> 项目ID</th>
+            <th><i class=" fa fa-edit"></i> Status</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+		{% for item in nodes %}
+        <tr>
+            <td><a small="{{ item.id }}" onclick="modaldevinfo($(this));">{{ item.ipaddr }}</a></td>
+            <td>{{ item.nodename }}</td>
+			<td class="hidden-phone">{{ item.project_id }}</td>
+            <td><span class="label label-info label-mini">Due</span></td>
+            <td>
+                <button type="submit" value="{{ item.id }}" ipaddr="{{ item.ipaddr }}" nodename="{{ item.nodename }}" sshport="{{ item.sshport }}" rootpwd="{{ item.rootpwd }}" projectid="{{ item.project_id }}" class="btn btn-primary btn-xs" onclick="modifymodal($(this));"><i class="fa fa-pencil"></i></button>
+                <button type="submit" value="{{ item.id }}" class="btn btn-danger btn-xs" onclick="confirmdelect($(this));"><i class="fa fa-trash-o "></i></button>
+            </td>
+        </tr>
+		{% endfor %}
+		</tbody>
+    </table>
+</div><!-- /content-panel -->
+<!-- 删除模态框 -->
+<div class="modal fade" id="myModal_confirmdelect" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+	    <div class="modal-header">
+	      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	      <h4 class="modal-title">确认删除</h4>
+	    </div>
+	    <div class="modal-body">
+	      你好，确认删除吗？
+	    </div>
+	    <div class="modal-footer">
+	      <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	      <button type="button" class="btn btn-primary" id="Modaldelect" onclick="delect();">确认</button>
+	    </div>
+	  </div>
+	</div>
+</div>
+<!-- 设备信息模态框 -->
+<div class="modal fade" id="myModal_devinfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+	    <div class="modal-header">
+	      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	      <h4 class="modal-title">设备信息</h4>
+	    </div>
+	    <div class="modal-body">
+            <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                <tr>
+                    <th>name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>IP</td>
+                    <td id="ip"></td>
+                </tr>
+                <tr>
+                    <td>节点</td>
+                    <td id="nodename"></td>
+                </tr>
+                <tr>
+                    <td>主板厂商</td>
+                    <td id="vendor"></td>
+                </tr>
+                <tr>
+                    <td>CPU</td>
+                    <td id="cpu"></td>
+                </tr>
+                <tr>
+                    <td>内存</td>
+                    <td id="mem"></td>
+                </tr>
+                <tr>
+                    <td>disk</td>
+                    <td id="disk"></td>
+                </tr>
+                <tr>
+                    <td>disk厂商</td>
+                    <td id="disk_vendor"></td>
+                </tr>
+                <tr>
+                    <td>加密狗</td>
+                    <td id="aladin"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+	    <div class="modal-footer">
+	      <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	      <button type="button" class="btn btn-primary" id="Modaldevinfo" data-dismiss="modal">确认</button>
+	    </div>
+	  </div>
+	</div>
+</div>
+<!--添加节点信息模态框 -->
+<div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal_addnode" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">添加节点</h4>
+			</div>
+			<div class="modal-body">
+				<p id='pprojectname'>项目名称:</p>
+				<input type="text" id="mprojectname" class="form-control placeholder-no-fix" disabled>
+				<br>
+				<p id='pip'>节点IP:</p>
+				<input type="text" id="mip" class="form-control placeholder-no-fix">
+                <br>
+				<p id='pnode'>节点名称:</p>
+				<input type="text" id="mnode" class="form-control placeholder-no-fix">
+                <br>
+				<p id='pport'>SSH端口:</p>
+				<input type="text" id="mport" class="form-control placeholder-no-fix">
+                <br>
+				<p id='ppwd'>ROOT密码:</p>
+				<input type="text" id="mpwd" class="form-control placeholder-no-fix">
+                <br>
+				<p id='pnum'>序列号:</p>
+				<input type="text" id="mnum" class="form-control placeholder-no-fix">
+                <br>
+				<p id='ppos'>位置:</p>
+				<input type="text" id="mpos" class="form-control placeholder-no-fix">
+                <br>
+				<p id='prem'>备注:</p>
+				<input type="text" id="mrem" class="form-control placeholder-no-fix">
+                <br>
+				<p id='ptime'>上架时间:</p>
+				<input type="text" id="mtime" class="form-control placeholder-no-fix">
+			</div>
+			<div class="modal-footer">
+				<button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+				<button class="btn btn-theme" id="Modaladd" type="button" onclick="addnode();">提交</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 修改模态框 -->
+<div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal_modify" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">修改节点</h4>
+			</div>
+			<div class="modal-body">
+				<p id='mpprojectid'>项目ID:</p>
+				<input type="text" id="mmprojectid" class="form-control placeholder-no-fix" disabled>
+				<br>
+				<p id='mpip'>节点IP:</p>
+				<input type="text" id="mmip" class="form-control placeholder-no-fix">
+                <br>
+				<p id='mpnode'>节点名称:</p>
+				<input type="text" id="mmnode" class="form-control placeholder-no-fix">
+                <br>
+				<p id='mpport'>SSH端口:</p>
+				<input type="text" id="mmport" class="form-control placeholder-no-fix">
+                <br>
+				<p id='mppwd'>ROOT密码:</p>
+				<input type="text" id="mmpwd" class="form-control placeholder-no-fix">
+			</div>
+			<div class="modal-footer">
+				<button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+				<button class="btn btn-theme" id="Modalmodify" type="button" onclick="modify();">提交</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function modaldevinfo(m){
+    var id = m.attr("small")
+    $.ajax({
+		url:"/cmdb/selectdevinfo/",
+		type:'GET',
+		data:{'id': id},
+		success: function(arg){
+			ret = eval(arg);
+			//alert(ret);
+			document.getElementById("ip").innerHTML = ret.ip;
+			document.getElementById("nodename").innerHTML = ret.nodename;
+			document.getElementById("vendor").innerHTML = ret.vendor;
+			document.getElementById("cpu").innerHTML = ret.cpu_model;
+			document.getElementById("mem").innerHTML = ret.memory;
+			document.getElementById("disk").innerHTML = ret.disk;
+			document.getElementById("disk_vendor").innerHTML = ret.disk_vendor;
+			document.getElementById("aladin").innerHTML = ret.aladin;
+			$('#myModal_devinfo').modal('show');
+		}
+	});
+}
+</script>
+<script>
+function modifymodal(m){
+    var id = m.val();
+	var ipaddr = m.attr("ipaddr")
+    var nodename = m.attr("nodename")
+    var sshport = m.attr("sshport")
+    var rootpwd = m.attr("rootpwd")
+    var projectid = m.attr("projectid")
+	//alert("{{ node.id }}");
+	document.getElementById("mmprojectid").setAttribute("value", projectid);
+	document.getElementById("mmip").setAttribute("value", ipaddr);
+	document.getElementById("mmnode").setAttribute("value", nodename);
+	document.getElementById("mmport").setAttribute("value", sshport);
+	document.getElementById("mmpwd").setAttribute("value", rootpwd);
+	document.getElementById("Modalmodify").setAttribute("small", id);
+	$('#myModal_modify').modal('show');
+}
+</script>
+
+<script>
+function confirmdelect(m){
+    var id = m.val();
+	//alert(id.val());
+	document.getElementById("Modaldelect").setAttribute("small", id);
+	$('#myModal_confirmdelect').modal('show');
+}
+</script>
+<script>
+    function addnodemodal(){
+        if("{{ project.id }}" !=0){
+            //alert("{{ project.id }}");
+            document.getElementById("mprojectname").setAttribute("value", "{{ project.projectname }}");
+            document.getElementById("mprojectname").setAttribute("small", "{{ project.id }}");
+            $('#myModal_addnode').modal('show');
+        }else{
+            swal({
+                type: 'error',
+                title: '请选择一个项目！',
+                confirmButtonText: '确定',
+                confirmButtonColor: '#4cd964'
+            });
+        }
+    }
+</script>
+//请求删除
+<script>
+function delect(){
+	var id = document.getElementById("Modaldelect").getAttribute("small");
+	//alert(id);
+	$.ajax({
+		url:"/cmdb/nodedel/",
+		type:'GET',
+		data:{'id': id},
+		success: function(arg){
+			ret = eval(arg);
+			if(ret.tips){
+				swal({
+					type: 'success',
+					title: '删除成功！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				}).then(function(){
+					window.location.reload();
+				});
+			}else{
+				swal({
+					type: 'error',
+					title: '删除失败！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				})
+			}
+		}
+	});
+}
+</script>
+//请求添加
+<script>
+function addnode(){
+	var projectid = document.getElementById("mprojectname").getAttribute("small");
+	var ip = $("#mip").val();
+	var port = $("#mport").val();
+	var nodename = $("#mnode").val();
+	var pwd = $("#mpwd").val();
+	var num = $("#mnum").val();
+	var pos = $("#mpos").val();
+	var rem = $("#mrem").val();
+	var time = $("#mtime").val();
+	//项目名称非空
+	if (ip==''){
+		document.getElementById("pip").style.color = 'red';
+		$("#mip").focus();
+		return ;
+	}
+	$.ajax({
+		url:"/cmdb/nodeadd/",
+		type:"GET",
+		data:{'projectid':projectid, 'ip':ip, 'port':port, 'nodename': nodename, 'pwd': pwd, 'num': num, 'pos': pos, 'rem': rem, 'time':time },
+		success: function(arg){
+			ret = eval(arg);
+			if(ret.tips == 'success'){
+				swal({
+					type: 'success',
+					title: '添加成功！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				}).then(function(){
+					window.location.reload();
+				});
+			}else if(ret.tips == 'existed'){
+				swal({
+					type: 'warning',
+					title: 'IP已存在！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				});
+			}else{
+				swal({
+					type: 'error',
+					title: '添加失败！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				})
+			}
+		}
+	});
+}
+</script>
+
+<script>
+//请求修改
+function modify(){
+	var id1 = document.getElementById("Modalmodify").getAttribute("small");
+	var projectid = $("#mmprojectid").val();
+	var ip = $("#mmip").val();
+	var port = $("#mmport").val();
+	var pwd = $("#mmpwd").val();
+	var nodename = $("#mmnode").val();
+	//项目名称非空
+	if (ip==''){
+		document.getElementById("mpip").style.color = 'red';
+		$("#mmip").focus();
+		return ;
+	}
+	$.ajax({
+		url:"/cmdb/nodemod/",
+		type:"GET",
+		data:{'id':id1, 'projectid':projectid, 'ip':ip, 'port':port, 'pwd':pwd, 'nodename':nodename},
+		success: function(arg){
+			ret = eval(arg);
+			if(ret.tips == 'success'){
+				swal({
+					type: 'success',
+					title: '修改成功！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				}).then(function(){
+					window.location.reload();
+				});
+			}else if(ret.tips == 'existed'){
+				swal({
+					type: 'warning',
+					title: 'IP已存在！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				});
+			}else{
+				swal({
+					type: 'error',
+					title: '修改失败！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				})
+			}
+		}
+	});
+}
+</script>
+<script>
+function coldata(){
+    $.ajax({
+		url:"/cmdb/collectdevinfo/",
+		type:"GET",
+		data:{},
+		success: function(arg){
+			ret = eval(arg);
+			if(ret.tips == 'success'){
+				swal({
+					type: 'success',
+					title: '成功！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				}).then(function(){
+					window.location.reload();
+				});
+			}else{
+				swal({
+					type: 'error',
+					title: '失败！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				})
+			}
+		}
+	});
+}
+</script>
+{% endblock %}

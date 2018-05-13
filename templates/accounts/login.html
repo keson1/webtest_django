@@ -7,7 +7,7 @@
     <meta name="author" content="Dashboard">
     <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
     
-    <title>SIGN IN</title>
+    <title>Devops(alpha)</title>
     <link rel="shortcut icon" href="/static/favicon.ico">
     <!-- Bootstrap core CSS -->
     <link href="/static/assets/css/bootstrap.css" rel="stylesheet">
@@ -19,7 +19,7 @@
     <link href="/static/assets/css/style-responsive.css" rel="stylesheet">
     
     <!-- sweetalert2插件的css -->
-		<link href="/templates/servermaterial/assets/SweetAlert2/dist/sweetalert2.css" rel="stylesheet">
+	<link href="/static/assets/SweetAlert2/dist/sweetalert2.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -54,8 +54,8 @@
 		            
 		            <div class="login-social-link centered">
 		            <p>or you can sign in via your social network</p>
-		                <button class="btn btn-facebook" type="button"><i class="fa fa-facebook"></i> Facebook</button>
-		                <button class="btn btn-twitter" type="button"><i class="fa fa-twitter"></i> Twitter</button>
+		                <button class="btn btn-facebook" type="button" onclick="tips_notopen();"><i class="fa fa-facebook"></i> Facebook</button>
+		                <button class="btn btn-twitter" type="button" onclick="tips_notopen();"><i class="fa fa-twitter"></i> Twitter</button>
 		            </div>
 		  
                     <div class="registration">
@@ -79,8 +79,8 @@
 		
 		                      </div>
 		                      <div class="modal-footer">
-		                          <button data-dismiss="modal" class="btn btn-default" type="button">Cancel</button>
-		                          <button class="btn btn-theme" type="button">Submit</button>
+		                          <button data-dismiss="modal" class="btn btn-default" type="button" >Cancel</button>
+		                          <button class="btn btn-theme" type="button" onclick="tips_notopen();">Submit</button>
 		                      </div>
 		                  </div>
 		              </div>
@@ -94,14 +94,14 @@
 		                          <h4 class="modal-title">Create an account</h4>
 		                      </div>
 		                      <div class="modal-body">
-		                          <p>Enter your Username below.</p>
+		                          <p id="pnewusername">Enter your Username below.</p>
 		                          <input type="text" name="new_username" placeholder="Username" autocomplete="off" class="form-control placeholder-no-fix">
                                   <br>
-                                  <p>Enter your e-mail address below.</p>
+                                  <p id="pneweamil">Enter your e-mail address below.</p>
 		                          <input type="text" name="new_email" placeholder="Email" autocomplete="off" class="form-control placeholder-no-fix">  
                                   <br>
-                                  <p>Enter your Password.</p>                     
-		                          <input type="text" name="new_password" placeholder="Password" autocomplete="off" class="form-control placeholder-no-fix"> 
+                                  <p id="pnewpassword">Enter your Password.</p>                     
+		                          <input type="password" name="new_password" placeholder="Password" autocomplete="off" class="form-control placeholder-no-fix"> 
 		
 		                      </div>
 		                      <div class="modal-footer">
@@ -121,8 +121,9 @@
     <!-- js placed at the end of the document so the pages load faster -->
     <script src="/static/assets/js/jquery.js"></script>
     <script src="/static/assets/js/bootstrap.min.js"></script>
+	
     <!-- sweetalert2插件的js -->
-		<script src="/templates/servermaterial/assets/SweetAlert2/dist/sweetalert2.js"></script>
+		<script src="/static/assets/SweetAlert2/dist/sweetalert2.js"></script>
 
     <!--BACKSTRETCH-->
     <!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
@@ -130,50 +131,61 @@
     <script>
         $.backstretch("/static/assets/img/login-bg.jpg", {speed: 500});
     </script>
+	<script>
+	//提示：未开通
+	function tips_notopen(){
+		swal({
+			type: 'warning',  
+			title: '模块未开通！',  
+			confirmButtonText: '确定', 
+			confirmButtonColor: '#4cd964' 
+		})
+	}
+	</script>
     <script>
 		$(document).ready(function(){
             // 注册按钮
 			$("#create").click(function(){
-				var user = $("input[name='createusername']").val();
-				var code = $("input[name='createpassword']").val();
-				var email = $("input[name='createemail']").val();
+				var user = $("input[name='new_username']").val();
+				var code = $("input[name='new_password']").val();
+				var email = $("input[name='new_email']").val();
 				// 账号未填写
 				if (user==''){
-					document.getElementById("pcreateusername").style.color = 'red';
-					$("input[name='createusername']").focus();
+					document.getElementById("pnewusername").style.color = 'red';
+					$("input[name='new_username']").focus();
 					return ;
 				}
 				// / 账号名合法
 				var uPattern = /^[a-zA-Z0-9_]{4,16}$/;
 				if (!uPattern.test(user)){
-					document.getElementById("pcreateusername").innerHTML = '请输入合法的用户名';
-					document.getElementById("pcreateusername").style.color = 'red';
-					$("input[name='createusername']").val("").focus();
+					document.getElementById("pnewusername").innerHTML = '请输入合法的用户名';
+					document.getElementById("pnewusername").style.color = 'red';
+					$("input[name='new_username']").val("").focus();
 					return ;
 				}
 				// 邮箱未填写
 				if (email==''){
-					document.getElementById("pcreateemail").style.color = 'red';
-					$("input[name='createemail']").focus();
+					document.getElementById("pneweamil").style.color = 'red';
+					$("input[name='new_email']").focus();
 					return ;
 				}
 				// 邮箱合法
 				var ePattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 				if (!ePattern.test(email)){
-					document.getElementById("pcreateemail").innerHTML = '请输入合法的邮箱';
-					document.getElementById("pcreateemail").style.color = 'red';
-					$("input[name='createemail']").val("").focus();
+					document.getElementById("pneweamil").innerHTML = '请输入合法的邮箱';
+					document.getElementById("pneweamil").style.color = 'red';
+					$("input[name='new_email']").val("").focus();
 					return ;
 				}
 				// 密码未填写
 				if (code==''){
-					document.getElementById("pcreatepassword").style.color = 'red';
-					$("input[name='createpassword']").focus();
+					document.getElementById("pnewpassword").style.color = 'red';
+					$("input[name='new_password']").focus();
 					return ;
 				}
 				// 请求注册
 				$.ajax({
-					url:"/createuser",
+					url:"/accounts/register/",
 					type:'POST',
 					data:{'user': user, 'email': email,'code': code},
 					success: function(arg){
@@ -187,12 +199,19 @@
 							}).then(function(){
 								window.location.reload();
 							});  
-						}else{
+						}else if (ret.reason == 'already existed'){
 							swal({  
 								type: 'error',  
 								title: '用户名已存在！',  
 								confirmButtonText: '确定', 
 								confirmButtonColor: '#4cd964'  
+							})
+						}else{
+							swal({
+								type: 'error',  
+								title: '添加失败！',  
+								confirmButtonText: '确定', 
+								confirmButtonColor: '#4cd964' 
 							})
 						}
 					}
@@ -205,13 +224,13 @@
 				var password = $("input[name='password']").val();
 				// 请求登陆
 				$.ajax({
-					url:"/accounts/loginauth",
+					url:"/accounts/loginauth/",
 					type:'POST',
 					data:{'username': username, 'password': password},
 					success: function(arg){
 						ret = eval(arg);
 						if(ret.status){
-							window.location.href='/main/';
+							window.location.href='/main/index';
 						}else{
 							swal({  
 								type: 'error',  
@@ -224,6 +243,6 @@
 				});
 			})
 		})
-		</script>
+	</script>
   </body>
 </html>
