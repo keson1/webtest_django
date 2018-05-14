@@ -26,3 +26,4 @@ class Nodes(models.Model):
     aladin = models.CharField(max_length=255, blank=True)
     position = models.CharField(max_length=100, blank=True)
     remark = models.TextField(max_length=200, blank=True)
+    graphics = models.CharField(max_length=200, blank=True)

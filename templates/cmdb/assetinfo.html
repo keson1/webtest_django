@@ -16,7 +16,7 @@
         </ul>
     </div>
     <div class="btn-group pull-right">
-        <button type="button" class="btn btn-theme03" name="getdata" onclick="coldata();">生成设备信息</button>
+        <button type="button" class="btn btn-theme03" small="{{ project.id }}" name="getdata" onclick="coldata($(this));">生成设备信息</button>
         <button type="button" class="btn btn-theme03"><i class="fa fa-check" onclick="addnodemodal();"> 添加资产</i></button>
     </div>
     <table class="table table-striped table-advance table-hover">
@@ -112,6 +112,10 @@
                     <td>加密狗</td>
                     <td id="aladin"></td>
                 </tr>
+                <tr>
+                    <td>显卡</td>
+                    <td id="video"></td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -200,6 +204,7 @@
 
 {% block scripts %}
 <script>
+//设备信息展示
 function modaldevinfo(m){
     var id = m.attr("small")
     $.ajax({
@@ -217,6 +222,7 @@ function modaldevinfo(m){
 			document.getElementById("disk").innerHTML = ret.disk;
 			document.getElementById("disk_vendor").innerHTML = ret.disk_vendor;
 			document.getElementById("aladin").innerHTML = ret.aladin;
+			document.getElementById("video").innerHTML = ret.video;
 			$('#myModal_devinfo').modal('show');
 		}
 	});
@@ -258,7 +264,7 @@ function confirmdelect(m){
             $('#myModal_addnode').modal('show');
         }else{
             swal({
-                type: 'error',
+                type: 'warning',
                 title: '请选择一个项目！',
                 confirmButtonText: '确定',
                 confirmButtonColor: '#4cd964'
@@ -401,11 +407,12 @@ function modify(){
 }
 </script>
 <script>
-function coldata(){
+function coldata(m){
+    id = m.attr("small")
     $.ajax({
 		url:"/cmdb/collectdevinfo/",
 		type:"GET",
-		data:{},
+		data:{'id': id},
 		success: function(arg){
 			ret = eval(arg);
 			if(ret.tips == 'success'){
@@ -417,10 +424,17 @@ function coldata(){
 				}).then(function(){
 					window.location.reload();
 				});
-			}else{
+			}else if(ret.tips == 'error'){
 				swal({
 					type: 'error',
 					title: '失败！',
+					confirmButtonText: '确定',
+					confirmButtonColor: '#4cd964'
+				})
+			}else{
+				swal({
+					type: 'warning',
+					title: '请选择一个项目！',
 					confirmButtonText: '确定',
 					confirmButtonColor: '#4cd964'
 				})

@@ -134,54 +134,63 @@ def nodemod(request):
     return JsonResponse({'tips':tips})
 
 def collectdevinfo(request):
+    pid = request.GET.get('id','')
     cmdlist = ['dmidecode |grep -A16 \'System Information$\'|grep -E \'Manufacturer|Product\'',  # 厂商
                'dmidecode -t 4 |grep Version | uniq',  # cup
                'dmidecode -t 17 | grep \'Size:\'|grep -v \'No Module Installed\'',  # 内存
                '/usr/bin/lsusb |grep Aladdin |wc -l',  # 加密狗
                'cat /proc/scsi/scsi | grep \'Model:\'',  # 硬盘厂商
-               'fdisk -l | grep \'Disk /dev/s\'|awk -F\' \' \'{print $2 $3 $4}\'']  # 硬盘
-    info = Nodes.objects.all()
-    tips = ''
-    for i in info:
-        ip = i.ipaddr
-        port = i.sshport
-        pwd = i.rootpwd
-        id = i.id
-        devinfo = ssh(ip, pwd, port, cmdlist)
-        if devinfo[0] == 'error':
-            vender = 0
-            cpu_model = 0
-            mem = 0
-            aladdin = 0
-            disk_vender = 0
-            disk = 0
-        else:
-            vender = devinfo[0].replace('\t','').strip().replace('\n', '')
-            cpu_model = devinfo[1].replace('\t','').strip().replace('\n', '')
-            mem = devinfo[2].replace('\t','').strip().replace('\n', '')
-            aladdin = devinfo[3].strip()
-            disk_vender = devinfo[4].replace('\t','').strip().replace('\n', '')
-            disk = devinfo[5].strip()
-        #print id, vender,cpu_model,mem,aladdin,disk_vender,disk
-        try:
-            r = Nodes.objects.get(pk=id)
-            r.vendor = vender
-            r.cpu_model = cpu_model
-            r.memory = mem
-            r.aladin = aladdin
-            r.disk_vender = disk_vender
-            r.disk = disk
-            r.save()
-            tips = 'success'
-        except Exception as e:
-            tips = 'error'
+               'fdisk -l | grep \'Disk /dev/s\'|awk -F\' \' \'{print $2 $3 $4}\'',    # 硬盘
+               'lspci | grep VGA | grep NVIDIA | awk -F[ \'{print $2}\' | awk -F] \'{print $1}\'']  # 显卡
+    info = Nodes.objects.filter(project_id=pid)
+    if info:
+        tips = ''
+        for i in info:
+            ip = i.ipaddr
+            port = i.sshport
+            pwd = i.rootpwd
+            id = i.id
+            devinfo = ssh(ip, pwd, port, cmdlist)
+            if devinfo[0] == 'error':
+                vender = 0
+                cpu_model = 0
+                mem = 0
+                aladdin = 0
+                disk_vender = 0
+                disk = 0
+                video = 0
+            else:
+                vender = devinfo[0].replace('\t','').strip().replace('\n', '')
+                cpu_model = devinfo[1].replace('\t','').strip().replace('\n', '')
+                mem = devinfo[2].replace('\t','').strip().replace('\n', '')
+                aladdin = devinfo[3].strip()
+                disk_vender = devinfo[4].replace('\t','').strip().replace('\n', '')
+                disk = devinfo[5].strip()
+                video = devinfo[6].strip()
+                #print disk
+            #print id, vender,cpu_model,mem,aladdin,disk_vender,disk
+            try:
+                r = Nodes.objects.get(pk=id)
+                r.vendor = vender
+                r.cpu_model = cpu_model
+                r.memory = mem
+                r.aladin = aladdin
+                r.disk_vender = disk_vender
+                r.disk = disk
+                r.graphics = video
+                r.save()
+                tips = 'success'
+            except Exception as e:
+                tips = 'error'
+    else:
+        tips = ''
     return JsonResponse({'tips': tips})
 
 def selectdevinfo(request):
     id = request.GET.get('id','')
     r = Nodes.objects.get(pk=id)
     res = {'ip':r.ipaddr, 'nodename':r.nodename, 'assetnum': r.asset_num, 'vendor':r.vendor, 'up_time': r.up_time, 'cpu_model':r.cpu_model,'cpu_num':r.cpu_num,
-        'memory':r.memory, 'disk':r.disk, 'disk_vendor':r.disk_vender, 'aladin':r.aladin, 'position':r.position}
+        'memory':r.memory, 'disk':r.disk, 'disk_vendor':r.disk_vender, 'aladin':r.aladin, 'position':r.position, 'video':r.graphics}
     return JsonResponse(res)
 
 
