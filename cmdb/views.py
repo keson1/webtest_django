@@ -151,33 +151,30 @@ def collectdevinfo(request):
                'fdisk -l | grep \'Disk /dev/s\'|awk -F\' \' \'{print $2 $3 $4}\'',    # 硬盘
                'lspci | grep VGA | grep NVIDIA | awk -F[ \'{print $2}\' | awk -F] \'{print $1}\'']  # 显卡
     info = Nodes.objects.filter(project_id=pid)
-    if info:
-        tips = ''
-        for i in info:
-            ip = i.ipaddr
-            port = i.sshport
-            pwd = i.rootpwd
-            id = i.id
-            devinfo = ssh(ip, pwd, port, cmdlist)
-            if devinfo[0] == 'error':
-                vender = 0
-                cpu_model = 0
-                mem = 0
-                aladdin = 0
-                disk_vender = 0
-                disk = 0
-                video = 0
-            else:
-                vender = devinfo[0].replace('\t','').strip().replace('\n', '')
-                cpu_model = devinfo[1].replace('\t','').strip().replace('\n', '')
-                mem = devinfo[2].replace('\t','').strip().replace('\n', '')
-                aladdin = devinfo[3].strip()
-                disk_vender = devinfo[4].replace('\t','').strip().replace('\n', '')
-                disk = devinfo[5].strip()
-                video = devinfo[6].strip()
-                #print disk
-            #print id, vender,cpu_model,mem,aladdin,disk_vender,disk
-            try:
+    if pid !='0':
+        if info:
+            for i in info:
+                ip = i.ipaddr
+                port = i.sshport
+                pwd = i.rootpwd
+                id = i.id
+                devinfo = ssh(ip, pwd, port, cmdlist)
+                if devinfo[0] == 'error':
+                    vender = 0
+                    cpu_model = 0
+                    mem = 0
+                    aladdin = 0
+                    disk_vender = 0
+                    disk = 0
+                    video = 0
+                else:
+                    vender = devinfo[0].replace('\t','').strip().replace('\n', '')
+                    cpu_model = devinfo[1].replace('\t','').strip().replace('\n', '')
+                    mem = devinfo[2].replace('\t','').strip().replace('\n', '')
+                    aladdin = devinfo[3].strip()
+                    disk_vender = devinfo[4].replace('\t','').strip().replace('\n', '')
+                    disk = devinfo[5].strip()
+                    video = devinfo[6].strip()
                 r = Nodes.objects.get(pk=id)
                 r.vendor = vender
                 r.cpu_model = cpu_model
@@ -187,9 +184,9 @@ def collectdevinfo(request):
                 r.disk = disk
                 r.graphics = video
                 r.save()
-                tips = 'success'
-            except Exception as e:
-                tips = 'error'
+            tips = 'success'
+        else:
+            tips = 'error'
     else:
         tips = ''
     return JsonResponse({'tips': tips})
@@ -197,8 +194,8 @@ def collectdevinfo(request):
 def selectdevinfo(request):
     id = request.GET.get('id','')
     r = Nodes.objects.get(pk=id)
-    res = {'ip':r.ipaddr, 'nodename':r.nodename, 'assetnum': r.asset_num, 'vendor':r.vendor, 'up_time': r.up_time, 'cpu_model':r.cpu_model,'cpu_num':r.cpu_num,
-        'memory':r.memory, 'disk':r.disk, 'disk_vendor':r.disk_vender, 'aladin':r.aladin, 'position':r.position, 'video':r.graphics}
+    res = {'ip': r.ipaddr, 'nodename': r.nodename, 'assetnum': r.asset_num, 'vendor': r.vendor, 'up_time': r.up_time, 'cpu_model': r.cpu_model,'cpu_num': r.cpu_num,
+        'memory': r.memory, 'disk': r.disk, 'disk_vendor': r.disk_vender, 'aladin': r.aladin, 'position': r.position, 'video': r.graphics}
     return JsonResponse(res)
 
 
