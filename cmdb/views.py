@@ -112,10 +112,14 @@ def nodemod(request):
     pwd = request.GET.get('pwd', '')
     ip = request.GET.get('ip', '')
     nodename = request.GET.get('nodename', '')
+    num = request.GET.get('num', '')
+    pos = request.GET.get('pos', '')
+    remark = request.GET.get('remark', '')
+    time = request.GET.get('time', '')
     q1 = Nodes.objects.filter(ipaddr=ip)
-    print q1
+    #print q1
     q2 = q1.exclude(pk=id)
-    print q2
+    #print q2
     if q2:
         tips = 'existed'
     else:
@@ -126,6 +130,10 @@ def nodemod(request):
             r.rootpwd = pwd
             r.nodename = nodename
             r.ipaddr = ip
+            r.asset_num = num
+            r.position = pos
+            r.remark = remark
+            r.up_time = time
             r.save()
             tips = 'success'
         except Exception as e:

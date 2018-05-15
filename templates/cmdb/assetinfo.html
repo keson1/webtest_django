@@ -37,7 +37,7 @@
 			<td class="hidden-phone">{{ item.project_id }}</td>
             <td><span class="label label-info label-mini">Due</span></td>
             <td>
-                <button type="submit" value="{{ item.id }}" ipaddr="{{ item.ipaddr }}" nodename="{{ item.nodename }}" sshport="{{ item.sshport }}" rootpwd="{{ item.rootpwd }}" projectid="{{ item.project_id }}" class="btn btn-primary btn-xs" onclick="modifymodal($(this));"><i class="fa fa-pencil"></i></button>
+                <button type="submit" value="{{ item.id }}" ipaddr="{{ item.ipaddr }}" nodename="{{ item.nodename }}" sshport="{{ item.sshport }}" rootpwd="{{ item.rootpwd }}" projectid="{{ item.project_id }}" num="{{ item.asset_num }}" pos="{{ item.position }}" remark="{{ item.remark }}" time="{{ item.up_time }}" class="btn btn-primary btn-xs" onclick="modifymodal($(this));"><i class="fa fa-pencil"></i></button>
                 <button type="submit" value="{{ item.id }}" class="btn btn-danger btn-xs" onclick="confirmdelect($(this));"><i class="fa fa-trash-o "></i></button>
             </td>
         </tr>
@@ -175,7 +175,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title">修改节点</h4>
+				<h4 class="modal-title">修改节点信息</h4>
 			</div>
 			<div class="modal-body">
 				<p id='mpprojectid'>项目ID:</p>
@@ -192,6 +192,18 @@
                 <br>
 				<p id='mppwd'>ROOT密码:</p>
 				<input type="text" id="mmpwd" class="form-control placeholder-no-fix">
+                <br>
+				<p id='mpnum'>序列号:</p>
+				<input type="text" id="mmnum" class="form-control placeholder-no-fix">
+                <br>
+				<p id='mppos'>位置:</p>
+				<input type="text" id="mmpos" class="form-control placeholder-no-fix">
+                <br>
+				<p id='mprem'>备注:</p>
+				<input type="text" id="mmrem" class="form-control placeholder-no-fix">
+                <br>
+				<p id='mptime'>上架时间:</p>
+				<input type="text" id="mmtime" class="form-control placeholder-no-fix">
 			</div>
 			<div class="modal-footer">
 				<button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
@@ -204,7 +216,7 @@
 
 {% block scripts %}
 <script>
-//设备信息展示
+//设备信息模态框展示
 function modaldevinfo(m){
     var id = m.attr("small")
     $.ajax({
@@ -228,14 +240,20 @@ function modaldevinfo(m){
 	});
 }
 </script>
+
 <script>
+//修改模态框
 function modifymodal(m){
     var id = m.val();
-	var ipaddr = m.attr("ipaddr")
-    var nodename = m.attr("nodename")
-    var sshport = m.attr("sshport")
-    var rootpwd = m.attr("rootpwd")
-    var projectid = m.attr("projectid")
+	var ipaddr = m.attr("ipaddr");
+    var nodename = m.attr("nodename");
+    var sshport = m.attr("sshport");
+    var rootpwd = m.attr("rootpwd");
+    var projectid = m.attr("projectid");
+    var num = m.attr("num");
+    var pos = m.attr("pos");
+    var remark = m.attr("remark");
+    var time = m.attr("time");
 	//alert("{{ node.id }}");
 	document.getElementById("mmprojectid").setAttribute("value", projectid);
 	document.getElementById("mmip").setAttribute("value", ipaddr);
@@ -243,11 +261,16 @@ function modifymodal(m){
 	document.getElementById("mmport").setAttribute("value", sshport);
 	document.getElementById("mmpwd").setAttribute("value", rootpwd);
 	document.getElementById("Modalmodify").setAttribute("small", id);
+	document.getElementById("mmnum").setAttribute("value", num);
+	document.getElementById("mmpos").setAttribute("value", pos);
+	document.getElementById("mmrem").setAttribute("value", remark);
+	document.getElementById("mmtime").setAttribute("value", time);
 	$('#myModal_modify').modal('show');
 }
 </script>
 
 <script>
+//确认删除模态框
 function confirmdelect(m){
     var id = m.val();
 	//alert(id.val());
@@ -256,6 +279,7 @@ function confirmdelect(m){
 }
 </script>
 <script>
+//添加资产模态框显示
     function addnodemodal(){
         if("{{ project.id }}" !=0){
             //alert("{{ project.id }}");
@@ -272,8 +296,9 @@ function confirmdelect(m){
         }
     }
 </script>
-//请求删除
+
 <script>
+//请求删除
 function delect(){
 	var id = document.getElementById("Modaldelect").getAttribute("small");
 	//alert(id);
@@ -304,8 +329,9 @@ function delect(){
 	});
 }
 </script>
-//请求添加
+
 <script>
+//请求添加
 function addnode(){
 	var projectid = document.getElementById("mprojectname").getAttribute("small");
 	var ip = $("#mip").val();
@@ -366,6 +392,10 @@ function modify(){
 	var port = $("#mmport").val();
 	var pwd = $("#mmpwd").val();
 	var nodename = $("#mmnode").val();
+	var num = $("#mmnum").val();
+	var pos = $("#mmpos").val();
+	var remark = $("#mmrem").val();
+	var time = $("#mmtime").val();
 	//项目名称非空
 	if (ip==''){
 		document.getElementById("mpip").style.color = 'red';
@@ -375,7 +405,7 @@ function modify(){
 	$.ajax({
 		url:"/cmdb/nodemod/",
 		type:"GET",
-		data:{'id':id1, 'projectid':projectid, 'ip':ip, 'port':port, 'pwd':pwd, 'nodename':nodename},
+		data:{'id':id1, 'projectid':projectid, 'ip':ip, 'port':port, 'pwd':pwd, 'nodename':nodename, 'num':num, 'pos':pos, 'remark':remark, 'time':time},
 		success: function(arg){
 			ret = eval(arg);
 			if(ret.tips == 'success'){
@@ -407,6 +437,7 @@ function modify(){
 }
 </script>
 <script>
+//生成资产信息
 function coldata(m){
     id = m.attr("small")
     $.ajax({

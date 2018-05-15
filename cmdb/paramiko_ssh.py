@@ -32,5 +32,5 @@ def ssh(ip,password,port,cmdlist):
         result = ['error']
         return result
 
-c = ssh('192.168.43.221', 'yisa123456', '22', ['hostname','df -h|awk \'{print $2,$5,$6}\'|grep -vE \'(/dev|/run|/sys|Use|/boot)\''])
-print c
+#c = ssh('192.168.43.221', 'yisa123456', '22', ['hostname','df -h|awk \'{print $2,$5,$6}\'|grep -vE \'(/dev|/run|/sys|Use|/boot)\''])
+#print c
