@@ -25,7 +25,7 @@ SECRET_KEY = '=!k&w=)*zons$h%lge7q^o$+eai3t%7t$16i7l9=3evi)zzy9y'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'accounts',
     'main',
     'cmdb',
+    'monitor',
 ]
 
 MIDDLEWARE_CLASSES = [
