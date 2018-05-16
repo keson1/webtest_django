@@ -9,7 +9,6 @@
 '''
 
 import paramiko
-import MySQLdb
 
 def ssh(ip,password,port,cmdlist):
     try:
