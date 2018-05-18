@@ -1,110 +1,111 @@
 {% extends "base.html" %}
 {% block mainbody %}
-    <h3><i class="fa fa-angle-right"></i> System Monitor</h3>
-    <div class="row">
-        <div class="col-md-4 col-sm-4 mb">
-            <div class="grey-panel pn donut-chart">
-                <div class="grey-header">
-                    <h5>MEMORY LOAD</h5>
-                </div>
-                <canvas id="serverstatus01" height="120" width="120"></canvas>
-                <script>
-                    setInterval(function () {
-                        $.get("/monitor/get/mem/{{ ip }}/").done(function (data) {
-                            var data = JSON.parse(data);
-                            document.getElementById("totalmem").innerHTML = data.memtotal+"MB";
-                            document.getElementById("timemem").innerHTML = data.newesttime;
-                            document.getElementById("hmem").innerHTML = data.usepercent+"%";
-                            var doughnutData = [
-                                {
-                                    value: data.usepercent,
-                                    color: "#FF6B6B"
-                                },
-                                {
-                                    value: data.availablepercent,
-                                    color: "#fdfdfd"
-                                }
-                            ];
-                            var myDoughnut = new Chart(document.getElementById("serverstatus01").getContext("2d")).Doughnut(doughnutData);
-                        });
-                    },10000);
-                </script>
-                <div class="row">
-                    <div class="col-sm-6 col-xs-6 goleft">
-                        <p>Total:<span id="totalmem"></span><p>
-
-                        <p>Latest time:<span id="timemem"></span></p>
-                    </div>
-                    <div class="col-sm-6 col-xs-6 display:inline;">
-                        <h2 id="hmem"></h2>
-                    </div>
-                </div>
-            </div><! --/grey-panel -->
-        </div><!-- /col-md-4-->
-
-        <div class="col-md-4 col-sm-4 mb">
-            <!-- REVENUE PANEL -->
-            <div class="green-panel pn">
-                <div class="green-header">
-                    <h5>CPU Usage</h5>
-                </div>
-                <div class="chart mt">
-                    <script>
-                    setInterval(function () {
-                        $.get("/monitor/get/cpu/{{ ip }}/").done(function (data) {
-                            var data = JSON.parse(data);
-                            document.getElementById("chartcpu").innerHTML = data.cpupercent;
-                            $('.sparkline').sparkline('html', {type:'line', width:"90%",height:"75",lineColor:"#fff",fillColor:"",spotRadius:"4",spotColor:'#fff', lineWidth:"2",highlightLineColor:"#fff" });
-                            document.getElementById("timecpu").innerHTML = data.newesttime;
-                        });
-                    },10000);
-                    </script>
-                    <div class="sparkline" id="chartcpu" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color="" data-highlight-line-color="#fff" data-spot-radius="4"></div>
-                </div>
-
-                <p class="mt"><b><span id="timecpu"></span></b><br/>Latest Time</p>
-            </div>
-        </div><!-- /col-md-4 -->
-        {% for partition in partitions_len %}
+    <div class="form-panel">
+        <h3><i class="fa fa-angle-right"></i> System Monitor: {{ ip }}</h3>
+        <div class="row">
             <div class="col-md-4 col-sm-4 mb">
-                <div class="darkblue-panel pn">
-                    <div class="darkblue-header">
-                        <h5 id="hdisk{{ partition }}"></h5>
+                <div class="grey-panel pn donut-chart">
+                    <div class="grey-header">
+                        <h5>MEMORY LOAD</h5>
                     </div>
-                    <canvas id="serverstatus02{{ partition }}" height="120" width="120"></canvas>
+                    <canvas id="serverstatus01" height="120" width="120"></canvas>
                     <script>
                         setInterval(function () {
-                            $.get("/monitor/get/disk/{{ ip }}/"+{{ partition }}).done(function (data) {
+                            $.get("/monitor/get/mem/{{ ip }}/").done(function (data) {
                                 var data = JSON.parse(data);
+                                document.getElementById("totalmem").innerHTML = data.memtotal+" MB";
+                                document.getElementById("timemem").innerHTML = data.newesttime;
+                                document.getElementById("hmem").innerHTML = data.usepercent+"%";
                                 var doughnutData = [
                                     {
-                                        value: data.avadiskpercent,
-                                        color:"#1c9ca7"
+                                        value: data.usepercent,
+                                        color: "#FF6B6B"
                                     },
                                     {
-                                        value : data.diskpercent,
-                                        color : "#f68275"
+                                        value: data.availablepercent,
+                                        color: "#fdfdfd"
                                     }
                                 ];
-                                var myDoughnut = new Chart(document.getElementById("serverstatus02{{ partition }}").getContext("2d")).Doughnut(doughnutData);
-                                document.getElementById("timedisk{{ partition }}").innerHTML = data.datatime;
-                                document.getElementById("hdisk{{ partition }}").innerHTML = "MountPoint: "+data.diskname;
-                                document.getElementById("diskpercent{{ partition }}").innerHTML = "Usage: "+data.diskpercent+"%";
-                                document.getElementById("disktotal{{ partition }}").innerHTML = " "+data.disktotal+" GB";
+                                var myDoughnut = new Chart(document.getElementById("serverstatus01").getContext("2d")).Doughnut(doughnutData);
                             });
                         },10000);
                     </script>
-                    <p id="timedisk{{ partition }}"></p>
-                    <footer>
-                        <div class="pull-left">
-                            <h5><i class="fa fa-hdd-o" id="disktotal{{ partition }}"></i></h5>
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-6 goleft">
+                            <b>Total: <span id="totalmem"></span></b><br>
+                            <b>Latest time: <span id="timemem"></span></b>
                         </div>
-                        <div class="pull-right">
-                            <h5 id="diskpercent{{ partition }}"></h5>
+                        <div class="col-sm-6 col-xs-6 display:inline;">
+                            <h2 id="hmem"></h2>
                         </div>
-                    </footer>
-                </div><! -- /darkblue panel -->
+                    </div>
+                </div><! --/grey-panel -->
+            </div><!-- /col-md-4-->
+
+            <div class="col-md-4 col-sm-4 mb">
+                <!-- REVENUE PANEL -->
+                <div class="green-panel pn">
+                    <div class="green-header">
+                        <h5>CPU Usage</h5>
+                    </div>
+                    <div class="chart mt">
+                        <script>
+                        setInterval(function () {
+                            $.get("/monitor/get/cpu/{{ ip }}/").done(function (data) {
+                                var data = JSON.parse(data);
+                                document.getElementById("chartcpu").innerHTML = data.cpupercent;
+                                $('.sparkline').sparkline('html', {type:'line', width:"90%",height:"75",lineColor:"#fff",fillColor:"",spotRadius:"4",spotColor:'#fff', lineWidth:"2",highlightLineColor:"#fff" });
+                                document.getElementById("timecpu").innerHTML = data.newesttime;
+                            });
+                        },10000);
+                        </script>
+                        <div class="sparkline" id="chartcpu" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color="" data-highlight-line-color="#fff" data-spot-radius="4"></div>
+                    </div>
+
+                    <p class="mt"><b><span id="timecpu"></span></b><br/>Latest Time</p>
+                </div>
             </div><!-- /col-md-4 -->
-        {% endfor %}
-    </div><!-- /END CHART - 4TH ROW OF PANELS -->
+            {% for partition in partitions_len %}
+                <div class="col-md-4 col-sm-4 mb">
+                    <div class="darkblue-panel pn">
+                        <div class="darkblue-header">
+                            <h5 id="hdisk{{ partition }}"></h5>
+                        </div>
+                        <canvas id="serverstatus02{{ partition }}" height="120" width="120"></canvas>
+                        <script>
+                            setInterval(function () {
+                                $.get("/monitor/get/disk/{{ ip }}/"+{{ partition }}).done(function (data) {
+                                    var data = JSON.parse(data);
+                                    var doughnutData = [
+                                        {
+                                            value: data.avadiskpercent,
+                                            color:"#1c9ca7"
+                                        },
+                                        {
+                                            value : data.diskpercent,
+                                            color : "#f68275"
+                                        }
+                                    ];
+                                    var myDoughnut = new Chart(document.getElementById("serverstatus02{{ partition }}").getContext("2d")).Doughnut(doughnutData);
+                                    document.getElementById("timedisk{{ partition }}").innerHTML = data.datatime;
+                                    document.getElementById("hdisk{{ partition }}").innerHTML = "MountPoint: "+data.diskname;
+                                    document.getElementById("diskpercent{{ partition }}").innerHTML = "Usage: "+data.diskpercent+"%";
+                                    document.getElementById("disktotal{{ partition }}").innerHTML = " "+data.disktotal+" GB";
+                                });
+                            },10000);
+                        </script>
+                        <p id="timedisk{{ partition }}"></p>
+                        <footer>
+                            <div class="pull-left">
+                                <h5><i class="fa fa-hdd-o" id="disktotal{{ partition }}"></i></h5>
+                            </div>
+                            <div class="pull-right">
+                                <h5 id="diskpercent{{ partition }}"></h5>
+                            </div>
+                        </footer>
+                    </div><! -- /darkblue panel -->
+                </div><!-- /col-md-4 -->
+            {% endfor %}
+        </div><!-- /END CHART - 4TH ROW OF PANELS -->
+    </div>
 {% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block header %}
+    <div class="nav notify-row" id="top_menu">
+        <!--  notification start -->
+        <ul class="nav top-menu">
+            <!-- settings start -->
+            <li class="dropdown">
+                {% for name,nodes in projectall.items %}
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-theme02 dropdown-toggle" data-toggle="dropdown">
+                            {{ name }} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            {% for nodename,ip in nodes.items %}
+                                <li><a href="{{ ip }}">{{ nodename }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+{% block mainbody %}
+    <h3><i class="fa fa-angle-right"></i> System Monitor</h3>
+{% endblock %}

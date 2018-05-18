@@ -5,11 +5,23 @@ from django.shortcuts import render
 from django.http.response import HttpResponse, JsonResponse
 from pymongo import MongoClient
 import json, time
+from cmdb.models import Nodes, Projects
 
 def index(request):
-    JsonResponse({'a':1})
+    projectall = Projects.objects.all()
+    projectdic = {}
+    for project in projectall:
+        nodes = project.nodes_set.all()
+        ips = {}
+        for node in nodes:
+            ips[node.nodename] = node.ipaddr
+        projectdic[project.projectname] = ips
+    ipall = Nodes.objects.all()
+    print projectdic
+    return render(request,"monitor/index.html",{"ipall":ipall, "projectall":projectdic})
 
 def received_sys_info(request):
+    warndata = {}
     if request.method == 'POST':
         received_json_data = json.loads(request.body)
         ip = received_json_data["ip"]
@@ -18,7 +30,38 @@ def received_sys_info(request):
         db = client[GetSysData.collection]
         collection = db[ip]
         collection.insert_one(received_json_data)
+        if int(received_json_data['memory']['percent']) > 80:
+            print 1
+            collection1 = db["warninfo"]
+            warndata["ip"] = received_json_data["ip"]
+            warndata["warntype"] = "mem"
+            warndata["warndata"] = received_json_data['memory']['percent']
+            warndata["timestamp"] = received_json_data['timestamp']
+            collection1.insert_one(warndata)
+        for disk in received_json_data["disks"]:
+            if int(disk['percent']) > 80:
+                print 2
+                collection1 = db["warninfo"]
+                warndata["ip"] = received_json_data["ip"]
+                warndata["warninfo"] = "disk"
+                warndata["warndata"] = disk['percent']
+                warndata["mountpoint"] = disk['mountpoint']
+                warndata["timestamp"] = received_json_data['timestamp']
+                collection1.insert_one(warndata)
         return HttpResponse("Post the system Monitor Data successfully!")
+    else:
+        return HttpResponse("Your push have errors, Please Check your data!")
+
+def received_warning_info(request):
+    if request.method == 'POST':
+        received_json_data = json.loads(request.body)
+        ip = received_json_data["ip"]
+        received_json_data['timestamp'] = int(time.time())
+        client = GetSysData.connect_db()
+        db = client["warninginfo"]
+        collection = db[ip]
+        collection.insert_one(received_json_data)
+        return HttpResponse("Post the Warning Data successfully!")
     else:
         return HttpResponse("Your push have errors, Please Check your data!")
 
@@ -68,6 +111,7 @@ def host_info(request, ip):
 def get_mem(request, ip):
     data_time = []
     mem_percent = []
+    memtotal = ""
     mem_data = GetSysData(ip, "memory")
     for doc in mem_data.get_data():
         unix_time = doc['timestamp']

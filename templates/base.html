@@ -48,6 +48,7 @@
             <!--logo start-->
             <a href="index.html" class="logo"><b>  DevOps{% block log %}{% endblock %}</b></a>
             <!--logo end-->
+            {% block header %}
             <div class="nav notify-row" id="top_menu">
                 <!--  notification start -->
                 <ul class="nav top-menu">
@@ -188,6 +189,7 @@
                 </ul>
                 <!--  notification end -->
             </div>
+            {% endblock %}
             <div class="top-menu">
             	<ul class="nav pull-right top-menu">
                     <li><a class="logout" href="/accounts/logout/">Logout</a></li>
@@ -230,10 +232,10 @@
                   <li class="sub-menu">
                       <a href="javascript:;" >
                           <i class="fa fa-cogs"></i>
-                          <span>Components</span>
+                          <span>Monitor</span>
                       </a>
                       <ul class="sub">
-                          <li><a  href="calendar.html">Calendar</a></li>
+                          <li><a  href="{% url "monitor" %}">System Monitor</a></li>
                           <li><a  href="gallery.html">Gallery</a></li>
                           <li><a  href="todo_list.html">Todo List</a></li>
                       </ul>

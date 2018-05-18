@@ -45,14 +45,14 @@ def get_boottime():
 def get_ip():
     try:
         hostname = socket.getfqdn(socket.gethostname())
-        ipaddr = socket.gethostbyname(hostname).replace('.','')
+        ipaddr = socket.gethostbyname(hostname)
     except Exception as msg:
-        print(msg)
+        #print(msg)
         ipaddr = ''
     return ipaddr
 
 #设置日志
-def log(log_name, path=None):
+def log(log_name, path):
     logging.basicConfig(level=logging.INFO,
                 format='%(asctime)s %(levelname)s %(message)s',
                 datefmt='%Y%m%d %H:%M:%S',
@@ -72,8 +72,8 @@ def post_data(url, data):
         logging.info(msg)
     return True
 
-server_ip = '192.168.1.8'
-log("agent.log","/root/")
+server_ip = '192.168.10.104:8000'
+log("agent.log","/home/asset/")
 
 #收集系统信息
 def collect_info_post():
