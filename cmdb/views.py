@@ -59,13 +59,13 @@ def projectmod(request):
 
 @login_required()
 def assetinfo(request):
-    id = request.GET.get('id', '')
+    id = request.GET.get('id', '1')
     projectlist = Projects.objects.all()
-    if id:
+    try:
         p = Projects.objects.get(pk=id)
         nodes = p.nodes_set.all()
         project = {'id': p.id, 'projectname': p.projectname}
-    else:
+    except Exception:
         project = {'id': 0,'projectname': '请选择项目'}
         nodes = {}
     return render(request,"cmdb/assetinfo.html",{'projectlist': projectlist, 'project': project,'nodes': nodes})
@@ -81,8 +81,7 @@ def nodeadd(request):
     rem = request.GET.get('rem', '')
     time = request.GET.get('time', '')
     #print projectid, ip, port, pwd, nodename
-    p = Nodes.objects.filter(project_id=int(projectid))
-    is_exist = p.filter(ipaddr=ip)
+    is_exist = Nodes.objects.filter(ipaddr=ip)
     if is_exist:
         tips = 'existed'
     else:
@@ -117,9 +116,7 @@ def nodemod(request):
     remark = request.GET.get('remark', '')
     time = request.GET.get('time', '')
     q1 = Nodes.objects.filter(ipaddr=ip)
-    #print q1
     q2 = q1.exclude(pk=id)
-    #print q2
     if q2:
         tips = 'existed'
     else:
@@ -143,6 +140,8 @@ def nodemod(request):
 
 def collectdevinfo(request):
     pid = request.GET.get('id','')
+    errorcount = 0
+    okcount = 0
     cmdlist = ['dmidecode |grep -A16 \'System Information$\'|grep -E \'Manufacturer|Product\'',  # 厂商
                'dmidecode -t 4 |grep Version | uniq',  # cup
                'dmidecode -t 17 | grep \'Size:\'|grep -v \'No Module Installed\'',  # 内存
@@ -167,6 +166,7 @@ def collectdevinfo(request):
                     disk_vender = 0
                     disk = 0
                     video = 0
+                    errorcount += 1
                 else:
                     vender = devinfo[0].replace('\t','').strip().replace('\n', '')
                     cpu_model = devinfo[1].replace('\t','').strip().replace('\n', '')
@@ -175,6 +175,7 @@ def collectdevinfo(request):
                     disk_vender = devinfo[4].replace('\t','').strip().replace('\n', '')
                     disk = devinfo[5].strip()
                     video = devinfo[6].strip()
+                    okcount += 1
                 r = Nodes.objects.get(pk=id)
                 r.vendor = vender
                 r.cpu_model = cpu_model
@@ -189,7 +190,7 @@ def collectdevinfo(request):
             tips = 'error'
     else:
         tips = ''
-    return JsonResponse({'tips': tips})
+    return JsonResponse({'tips': tips, "errorcount": errorcount, "okcount": okcount})
 
 def selectdevinfo(request):
     id = request.GET.get('id','')

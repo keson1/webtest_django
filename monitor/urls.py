@@ -22,7 +22,12 @@ urlpatterns=[
     url(r'^get/mem/(?P<ip>.+)/$', views.get_mem, name='get_mem'),
     url(r'^get/disk/(?P<ip>.+)/(?P<partition>\d+)/$', views.get_disk, name='get_disk'),
     url(r'^received/sys/info/$', views.received_sys_info, name='received_sys_info'),
-    url(r'^received/warning/info/$', views.received_warning_info, name='received_warning_info'),
+    url(r'^diskwarn/$', views.diskwarn, name='diskwarn'),
+    url(r'^memwarn/$', views.memwarn, name='memwarn'),
+    url(r'^pingwarn/$', views.pingwarn, name='pingwarn'),
+    url(r'^memwarnchart/$', views.memwarnchart, name='memwarnchart'),
+    url(r'^diskwarnchart/$', views.diskwarnchart, name='diskwarnchart'),
+    url(r'^pingwarnchart/$', views.pingwarnchart, name='pingwarnchart'),
 ]
 
 

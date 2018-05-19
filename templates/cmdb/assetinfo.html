@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-
+{% block log %}
+    CMDB
+{% endblock %}
 {% block mainbody %}
 <div class="form-panel">
     <h4><i class="fa fa-angle-right"></i> 资产信息</h4>
@@ -14,6 +16,7 @@
                 <li><a href="{% url "assetinfo" %}?id={{ item.id }}">{{ item.projectname }}</a></li>
             {% endfor %}
         </ul>
+        <a href="{% url "projectmanage" %}"><button type="button" class="btn btn-theme03">项目添加</button></a>
     </div>
     <div class="btn-group pull-right">
         <button type="button" class="btn btn-theme03" small="{{ project.id }}" name="getdata" onclick="coldata($(this));">生成设备信息</button>
@@ -24,7 +27,7 @@
         <tr>
             <th><i class="fa fa-bullhorn"></i> IP地址</th>
             <th><i class="fa fa-bookmark"></i> 节点名称</th>
-			<th class="hidden-phone"><i class="fa fa-question-circle"></i> 项目ID</th>
+			<th class="hidden-phone"><i class="fa fa-question-circle"></i> 项目名称</th>
             <th><i class=" fa fa-edit"></i> Status</th>
             <th></th>
         </tr>
@@ -34,8 +37,14 @@
         <tr>
             <td><a small="{{ item.id }}" onclick="modaldevinfo($(this));">{{ item.ipaddr }}</a></td>
             <td>{{ item.nodename }}</td>
-			<td class="hidden-phone">{{ item.project_id }}</td>
-            <td><span class="label label-info label-mini">Due</span></td>
+			<td class="hidden-phone">{{ item.project.projectname }}</td>
+            {% if item.status == 1 %}
+                <td><span class="badge bg-theme">ok</span></td>
+            {% elif item.status == 0 %}
+                <td><span class="badge bg-important">异常</span></td>
+            {% else %}
+                <span class="badge bg-theme"></span>
+            {% endif %}
             <td>
                 <button type="submit" value="{{ item.id }}" ipaddr="{{ item.ipaddr }}" nodename="{{ item.nodename }}" sshport="{{ item.sshport }}" rootpwd="{{ item.rootpwd }}" projectid="{{ item.project_id }}" num="{{ item.asset_num }}" pos="{{ item.position }}" remark="{{ item.remark }}" time="{{ item.up_time }}" class="btn btn-primary btn-xs" onclick="modifymodal($(this));"><i class="fa fa-pencil"></i></button>
                 <button type="submit" value="{{ item.id }}" class="btn btn-danger btn-xs" onclick="confirmdelect($(this));"><i class="fa fa-trash-o "></i></button>
@@ -449,7 +458,7 @@ function coldata(m){
 			if(ret.tips == 'success'){
 				swal({
 					type: 'success',
-					title: '成功！',
+					title: '成功:'+ret.okcount+",失败:"+ret.errorcount+"!",
 					confirmButtonText: '确定',
 					confirmButtonColor: '#4cd964'
 				}).then(function(){
