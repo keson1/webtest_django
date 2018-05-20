@@ -8,6 +8,8 @@ import pymongo
 import json, time
 from cmdb.models import Nodes, Projects
 import os
+from models import Pagedata
+from datetime import datetime
 
 def index(request):
     projectcount = Projects.objects.count()
@@ -36,7 +38,6 @@ def received_sys_info(request):
         collection = db[ip]
         collection.insert_one(received_json_data)
         if int(received_json_data['memory']['percent']) > 80:
-            #print 1
             warndata["ip"] = received_json_data["ip"]
             warndata["warntype"] = "mem"
             warndata["warndata"] = received_json_data['memory']['percent']
@@ -51,7 +52,6 @@ def received_sys_info(request):
                 diskpercent.append(disk['percent'])
                 mountpoint.append(disk["mountpoint"])
         if diskpercent:
-                #print 2
                 warndata["ip"] = received_json_data["ip"]
                 warndata["warntype"] = "disk"
                 warndata["warndata"] = diskpercent
@@ -60,6 +60,36 @@ def received_sys_info(request):
                 db = client["diskwarninfo"]
                 collection = db[ip]
                 collection.insert_one(warndata)
+        return HttpResponse("Post the system Monitor Data successfully!")
+    else:
+        return HttpResponse("Your push have errors, Please Check your data!")
+
+def received_page_info(request):
+    if request.method == 'POST':
+        received_json_data = json.loads(request.body)
+        data = received_json_data["data"]
+        for pageinfo in data:
+            nowtime = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
+            if pageinfo["passtime"] == "error" or pageinfo["totaluser"] == "error":
+                status = "0"
+            else:
+                status = "1"
+            is_exist = Pagedata.objects.filter(ip=pageinfo["ip"])
+            if is_exist:
+                r = Pagedata.objects.get(ip=pageinfo["ip"])
+                r.region = pageinfo["region"]
+                r.totaluser = pageinfo["totaluser"]
+                r.totaldata = pageinfo["totaldata"]
+                r.totallog = pageinfo["totallog"]
+                r.passtime = pageinfo["passtime"]
+                r.querytime = nowtime
+                r.status = status
+                r.save()
+            else:
+                if pageinfo["passtime"] == "error" or pageinfo["totaluser"] == "error":
+                    status = "异常"
+                r = Pagedata(ip=pageinfo["ip"], region=pageinfo["region"], totaluser=pageinfo["totaluser"], totaldata=pageinfo["totaldata"], totallog=pageinfo["totallog"], passtime=pageinfo["passtime"], querytime=nowtime, status=status)
+                r.save()
         return HttpResponse("Post the system Monitor Data successfully!")
     else:
         return HttpResponse("Your push have errors, Please Check your data!")
@@ -75,7 +105,7 @@ class GetSysData(object):
 
     @classmethod
     def connect_db(cls):
-        mongodb_ip = '192.168.171.200'
+        mongodb_ip = '192.168.43.221'
         mongodb_port = '27017'
         mongodb_user = ''
         mongodb_pwd = ''

@@ -59,20 +59,32 @@
             <thead>
             <tr>
                 <th><i class="fa fa-bullhorn"></i> 地区</th>
+                <th><i class="fa fa-bullhorn"></i> ip</th>
                 <th><i class="fa fa-bookmark"></i> 查询时间</th>
                 <th><i class=" fa fa-edit"></i> 最后过车时间</th>
 	    		<th class="hidden-phone"><i class="fa fa-question-circle"></i> 数据量</th>
+                <th class="hidden-phone"><i class="fa fa-question-circle"></i> 用户数</th>
+                <th class="hidden-phone"><i class="fa fa-question-circle"></i> 操作总数</th>
                 <th><i class=" fa fa-edit"></i> 状态</th>
             </tr>
             </thead>
             <tbody>
-	    	{% for item in warndatalist %}
+	    	{% for item in pageinfo %}
                 <tr>
-                    <td><font color="red">{{ item.ip }}</font></td>
-                    <td>{{ item.nodename }}</td>
-	    	    	<td class="hidden-phone">{{ item.projectname }}</td>
-                    <td>{{ item.time }}</td>
-                    <td><font color="red">{{ item.percent }}</font></td>
+                    <td>{{ item.region }}</td>
+                    <td>{{ item.ip }}</td>
+	    	    	<td class="hidden-phone">{{ item.querytime }}</td>
+                    <td>{{ item.passtime }}</td>
+                    <td>{{ item.totaldata }}</td>
+                    <td>{{ item.totaluser }}</td>
+                    <td>{{ item.totallog }}</td>
+                    {% if item.status == "1" %}
+                        <td><span class="badge bg-theme">ok</span></td>
+                    {% elif item.status == "0" %}
+                        <td><span class="badge bg-important">异常</span></td>
+                    {% else %}
+                        <span class="badge bg-theme"></span>
+                    {% endif %}
                 </tr>
 	    	{% endfor %}
 	    	</tbody>
@@ -103,4 +115,39 @@
         return false;
         });
 </script>
+ <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: "/monitor/memwarn/",
+                type: 'GET',
+                data: {},
+                success: function (arg) {
+                    ret = eval(arg);
+                    document.getElementById("hmemwarn").innerHTML = ret.count;
+                }
+            });
+        });
+        $(document).ready(function(){
+            $.ajax({
+                url: "/monitor/diskwarn/",
+                type: 'GET',
+                data: {},
+                success: function (arg) {
+                    ret = eval(arg);
+                    document.getElementById("hdiskwarn").innerHTML = ret.count;
+                }
+            });
+        });
+        $(document).ready(function(){
+            $.ajax({
+                url: "/monitor/pingwarn/",
+                type: 'GET',
+                data: {},
+                success: function (arg) {
+                    ret = eval(arg);
+                    document.getElementById("hpingwarn").innerHTML = ret.count;
+                }
+            });
+        });
+ </script>
 {% endblock %}

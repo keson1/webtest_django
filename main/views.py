@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http.response import HttpResponse
 from django.contrib.auth.decorators import login_required
 from cmdb.models import Projects, Nodes
+from monitor.models import Pagedata
 
 @login_required()
 def main(request):
@@ -12,13 +13,14 @@ def main(request):
     projectcount = Projects.objects.count()
     nodecount = Nodes.objects.count()
     projects = Projects.objects.all()
+    pageinfo = Pagedata.objects.all()
     for project in projects:
         projectname = project.projectname
         projectid = project.id
         projectdata = {"projectname":projectname, "projectid": projectid}
         projectlist.append(projectdata)
     username = request.user.username
-    return render(request, 'main/main.html', {'username': username, 'projectlist': projectlist, "projectcount": projectcount, "nodecount": nodecount})
+    return render(request, 'main/main.html', {'username': username, 'projectlist': projectlist, "projectcount": projectcount, "nodecount": nodecount, "pageinfo":pageinfo})
 
 @login_required()
 def index(request):
