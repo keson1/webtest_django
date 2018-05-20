@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^nodemod/', views.nodemod, name='nodemod'),
     url(r'^collectdevinfo/', views.collectdevinfo, name='collectdevinfo'),
     url(r'^selectdevinfo/', views.selectdevinfo, name='selectdevinfo'),
+    url(r'^batchinput/', views.batchinput, name='batchinput'),
 ]

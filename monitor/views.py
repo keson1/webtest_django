@@ -105,7 +105,7 @@ class GetSysData(object):
 
     @classmethod
     def connect_db(cls):
-        mongodb_ip = '192.168.43.221'
+        mongodb_ip = '192.168.171.200'
         mongodb_port = '27017'
         mongodb_user = ''
         mongodb_pwd = ''

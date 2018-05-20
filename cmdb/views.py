@@ -6,6 +6,7 @@ from django.http.response import HttpResponse,JsonResponse
 from django.contrib.auth.decorators import login_required
 from models import Projects, Nodes
 from paramiko_ssh import ssh
+from batchimport import batchimport
 
 def projectadd(request):
     tips = ''
@@ -200,5 +201,34 @@ def selectdevinfo(request):
     return JsonResponse(res)
 
 
-
+def batchinput(request):
+    nodelist = batchimport()
+    okcount = 0
+    errorcount = 0
+    if nodelist:
+        for node in nodelist:
+            is_exist = Nodes.objects.filter(ipaddr=node["ip"])
+            project = Projects.objects.get(projectname=node["projectname"])
+            if project:
+                projectid = project.id
+            else:
+                errorcount += 1
+                continue
+            if is_exist:
+                r = Nodes.objects.get(ipaddr=node["ip"])
+                r.position = node["position"]
+                r.up_time = node["uptime"]
+                r.asset_num = node["num"]
+                r.nodename = node["nodename"]
+                r.project_id = projectid
+                r.sshport = node["sshport"]
+                r.rootpwd = node["rootpwd"]
+                r.remark = node["remark"]
+                r.save()
+                okcount += 1
+            else:
+                r = Nodes(ipaddr=node["ip"], position=node["position"], up_time=node["uptime"], asset_num=node["num"], nodename=node["nodename"], project_id=projectid, sshport=node["sshport"], rootpwd=node["rootpwd"], remark= node["remark"])
+                r.save()
+                okcount += 1
+    return JsonResponse({"okcount":okcount, "errorcount":errorcount})
 
