@@ -9,9 +9,11 @@
 '''
 
 from openpyxl import load_workbook
-
+import os
 def batchimport():
-    wb = load_workbook("C:\Users\yisa\Desktop\code\webtest_django\cmdb\\batchimport.xlsx")
+    basepath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = os.path.join(basepath, 'batch.xlsx')
+    wb = load_workbook(path)
     ws = wb[wb.sheetnames[0]]
     rows = ws.max_row
     nodelist = []
